@@ -4,10 +4,10 @@ Welcome to an automated way of setting and changing your background with Python.
 ## Motivation
 
 I created this as an effort to become more acquainted with python, and do something that seems fun.
+
 ## Installation
 
-Provide code examples and explanations of how to get the project.
-
+Use the python 3 compiler and run change_background.py
 
 ## Tests
 

@@ -111,7 +111,8 @@ def getImageFromReddit(subreddit):
                 localFileName = 'reddit_%s_%s_album_None_imgur_%s' % (subreddit, submission.id, imageFile)
                 downloadImage(imageUrl, localFileName)
             except:
-                print(soup)
+                #Printing the submission url, gives us insight on where we are failing to improve the process
+                print('Could not parse the beautiful soup')
                 print(submission.url)
 
 getImageFromReddit('wallpapers')
