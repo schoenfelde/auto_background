@@ -7,6 +7,10 @@ I created this as an effort to become more acquainted with python, and do someth
 
 ## Installation
 
+First install the required packages:
+
+`pip install -r requirements.txt`
+
 Use the python 3 compiler and run change_background.py
 
 ## Tests
