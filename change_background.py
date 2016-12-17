@@ -20,26 +20,46 @@ code = reddit.config['RESPONSE_TYPE']
 #Goals: get picture from reddit.com/r/earthporn
 #       set picture as background on a timer
 
+
 def purgeImages(directory,amountToKeep):
+    '''
+    Purge any images from the picture director that
+    are over the amount we decide to keep
+    '''
+
     print(directory)
-    #images = sorted(os.listdir(r"" + directory), key=os.path.getctime)
     images = os.listdir(r"" + directory)
     print(len(images))
+    #if we have more than our purge amount
+    #then we continue with the purge 
     if len(images) > amountToKeep:
         os.remove(os.path.join(directory, images[-1]))
         purgeImages(directory,amountToKeep)
 
 def setBackground():
+    '''
+    Currently works on windows 10 as 
+    means to set your desktop background 
+    permanently and immediately
+    chooses a random image in your directory
+    to set it to
+    '''
+
     pic_dir = os.path.join(os.getcwd(), 'pictures')
     images = os.listdir(pic_dir)
-    count = random.randint(0,9)
+    count = random.randint(0,len(images))
     img = os.path.join(pic_dir,images[count])
     SPI_SETDESKWALLPAPER = 20
     print(img)
     ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, img, 3)
 
+#regex pattern for URL matching
 imgurUrlPattern = re.compile(r'(http://i.imgur.com/(.*))(\?.*)?')
+
 def downloadImage(imageUrl, localFileName):
+    '''
+    Download the image
+    '''
     response = requests.get(imageUrl)
     if not os.path.exists('pictures'):
         os.makedirs('pictures')
@@ -52,25 +72,46 @@ def downloadImage(imageUrl, localFileName):
                 fo.write(chunk)
 
 def getImageFromReddit(subreddit):
+    '''
+    get immages from the subreddit input 
+    that will be used as background images
+    '''
+
+    #connect to the reddit api
     r = praw.Reddit(user_agent='Change Background Script',client_id=client_id,client_secret=client_secret)
+
+    #using PRAW, order by hot and only look at the top 10
     for submission in r.subreddit(subreddit).hot(limit=100):
         # Check for all the cases where we will skip a submission:
         print(submission.url)
-        if "imgur.com/" not in submission.url:
+        if "imgur.com/" not in submission.url and "redd" not in submission.url:
+            print("Skipping because imgur or redd not in submission.url")
             continue # skip non-imgur submissions
+
         if submission.score < 10:
+            print("Skipping because the submission score is under 10")
             continue # skip submissions that haven't even reached 100 (thought this should be rare if we're collecting the "hot" submission)
+
         if len(glob('reddit_%s_*' % (submission.id))) > 0:
+            print("this is already downloaded, do not download again")
             continue # we've already downloaded files for this reddit submission
+
+        if 'redd' in submission.url:
+            #download reddit hosted images
+            localFileName = 'reddit_%s_%s_album_None_imgur_%s' % (subreddit, submission.id, imgurFilename)
+            downloadImage(submission.url,localFileName)
+
         if 'http://imgur.com/a/' in submission.url:
             # This is an album submission.
+            print("this is an album submission")
             albumId = submission.url[len('http://imgur.com/a/'):]
             htmlSource = requests.get(submission.url).text
-            soup = BeautifulSoup(htmlSource)
+            soup = BeautifulSoup(htmlSource,"html.parser")
 
             matches = soup.select('.album-view-image-link a')
 
             for match in matches:
+                print("imgur match: " + match)
 
                 imageUrl = match['href']
 
@@ -83,6 +124,7 @@ def getImageFromReddit(subreddit):
 
         elif 'http://i.imgur.com/' in submission.url:
             # The URL is a direct link to the image.
+            print("direct link")
             mo = imgurUrlPattern.search(submission.url) # using regex here instead of BeautifulSoup because we are pasing a url, not html
             imgurFilename = mo.group(2)
             if '?' in imgurFilename:
@@ -114,7 +156,16 @@ def getImageFromReddit(subreddit):
                 #Printing the submission url, gives us insight on where we are failing to improve the process
                 print('Could not parse the beautiful soup')
                 print(submission.url)
+        else:
+            print("Could not parse the link")
 
-getImageFromReddit('wallpapers')
-purgeImages(os.path.join(os.getcwd(), 'pictures'), 50)
-setBackground()
+
+if __name__ == '__main__':
+    '''
+    If this program is the main program call
+    all of the functions to get the images, 
+    set the background, and purge old images
+    '''
+    getImageFromReddit('wallpapers')
+    purgeImages(os.path.join(os.getcwd(), 'pictures'), 50)
+    setBackground()
