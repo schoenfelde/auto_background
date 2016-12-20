@@ -1,4 +1,5 @@
 ## Synopsis
+
 Welcome to an automated way of setting and changing your background with Python. This currently has only been tested on Windows 10. If you would like to automate this process, you can use schtasks on the cmd line.
 
 ## Motivation
@@ -9,9 +10,17 @@ I created this as an effort to become more acquainted with python, and do someth
 
 First install the required packages:
 
-`pip install -r requirements.txt`
+`python3 -m pip install -r requirements.txt`
 
-Use the python 3 compiler and run change_background.py
+Where python3 is the python 3 executable. 
+
+Then go to [Reddit's Api Page](https://www.reddit.com/dev/api/) and create an account
+
+Then enter your new credentials in reddit.py.
+
+Then you can run the program with:
+
+`python3 change_background.py'
 
 ## Tests
 

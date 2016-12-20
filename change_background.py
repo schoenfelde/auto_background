@@ -55,6 +55,7 @@ def setBackground():
 
 #regex pattern for URL matching
 imgurUrlPattern = re.compile(r'(http://i.imgur.com/(.*))(\?.*)?')
+redditUrlPattern = re.compile(r'(https://i.redd.it/(.*))(\?.*)?')
 
 def downloadImage(imageUrl, localFileName):
     '''
@@ -98,8 +99,13 @@ def getImageFromReddit(subreddit):
 
         if 'redd' in submission.url:
             #download reddit hosted images
-            localFileName = 'reddit_%s_%s_album_None_imgur_%s' % (subreddit, submission.id, imgurFilename)
-            downloadImage(submission.url,localFileName)
+            try:
+                mo = redditUrlPattern.search(submission.url)
+                imgurFilename = mo.group(2)
+                localFileName = 'reddit_%s_%s_album_None_imgur_%s' % (subreddit, submission.id, imgurFilename)
+                downloadImage(submission.url,localFileName)
+            except:
+                print('error getting reddit search regex')
 
         if 'http://imgur.com/a/' in submission.url:
             # This is an album submission.
@@ -166,6 +172,10 @@ if __name__ == '__main__':
     all of the functions to get the images, 
     set the background, and purge old images
     '''
+    print("***********************************")
+    print("Beginning Change Background ")
+    print("***********************************")
     getImageFromReddit('wallpapers')
     purgeImages(os.path.join(os.getcwd(), 'pictures'), 50)
     setBackground()
+    print("DONE")
