@@ -9,17 +9,9 @@ import re, os
 import ctypes
 import random
 
-#keep track of our wallpaper loop
-count = 0
-
 #Configuration settings
 client_id = reddit.config['CLIENT_ID']
 client_secret = reddit.config['CLIENT_SECRET']
-redirect_uri = reddit.config['REDIRECT_URI']
-code = reddit.config['RESPONSE_TYPE']
-#Goals: get picture from reddit.com/r/earthporn
-#       set picture as background on a timer
-
 
 def purgeImages(directory,amountToKeep):
     '''
@@ -41,8 +33,7 @@ def setBackground():
     Currently works on windows 10 as 
     means to set your desktop background 
     permanently and immediately
-    chooses a random image in your directory
-    to set it to
+    will choose a random image in your directory
     '''
 
     pic_dir = os.path.join(os.getcwd(), 'pictures')
@@ -61,6 +52,7 @@ def downloadImage(imageUrl, localFileName):
     '''
     Download the image
     '''
+
     response = requests.get(imageUrl)
     if not os.path.exists('pictures'):
         os.makedirs('pictures')
@@ -172,10 +164,21 @@ if __name__ == '__main__':
     all of the functions to get the images, 
     set the background, and purge old images
     '''
+
     print("***********************************")
     print("Beginning Change Background ")
     print("***********************************")
-    getImageFromReddit('wallpapers')
-    purgeImages(os.path.join(os.getcwd(), 'pictures'), 50)
+
+    #Do not stop processing if you cannot access reddit
+    #Still choose a new background
+    try:
+        getImageFromReddit('wallpapers')
+    except:
+        print('Error getting the image from Reddit')
+    try:
+        purgeImages(os.path.join(os.getcwd(), 'pictures'), 50)
+    except:
+        print('Error purgin images')
+
     setBackground()
     print("DONE")

@@ -14,13 +14,15 @@ First install the required packages:
 
 Where python3 is the python 3 executable. 
 
-Then go to [Reddit's Api Page](https://www.reddit.com/dev/api/) and create an account
-
-Then enter your new credentials in reddit.py.
+To get access to reddit go to [Reddit's Api Page](https://www.reddit.com/dev/api/) and create an account. When you have registered a new client application, enter your new credentials in reddit.py.
 
 Then you can run the program with:
 
-`python3 change_background.py'
+`python3 change_background.py`
+
+Tools for automating the process: 
+
+[Configuring a windows task to run a Python script](https://blogs.esri.com/esri/arcgis/2013/07/30/scheduling-a-scrip/)
 
 ## Tests
 
